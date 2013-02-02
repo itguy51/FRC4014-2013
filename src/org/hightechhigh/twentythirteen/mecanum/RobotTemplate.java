@@ -52,25 +52,27 @@ public class RobotTemplate extends IterativeRobot {
             System.out.println("Y: " + (drive.getY() * -1.0));
             System.out.println("ROT: " + drive.getTwist());
         }*/
-        tv = drive.getTwist();
+        /*tv = drive.getTwist();
         if(Math.abs(tv) < constants.DEADBAND_VAL){
             tv = 0;
         }else{
             tv *= Math.abs(tv);
             tv *= 0.5;
-        }
-        if(drive.getRawButton(1)){
-            System.out.println("X: " + drive.getX());
-            System.out.println("Y: " + (drive.getY() * -1.0));
-            System.out.println("ROT: " + drive.getTwist());
-        }
+        }*/
+        
         mag = drive.getMagnitude();
         if(Math.abs(mag) < constants.DEADBAND_VAL){
             mag = 0;
         }else{
             mag *= Math.abs(mag);
         }
-        rdrive.mecanumDrive_Polar(mag, (float)drive.getDirectionDegrees(), tv);
+        
+        if(drive.getRawButton(1)){
+            rdrive.mecanumDrive_Polar(mag, (float)drive.getDirectionDegrees(), 0);
+        }else{
+            rdrive.arcadeDrive(drive);
+        }
+        
         /*xv = drive.getX();
         if(Math.abs(xv) < constants.DEADBAND_VAL){
             xv = 0;
