@@ -66,11 +66,13 @@ public class RobotTemplate extends IterativeRobot {
         }else{
             mag *= Math.abs(mag);
         }
+        mag *= 0.5;
         
         if(drive.getRawButton(1)){
             rdrive.mecanumDrive_Polar(mag, (float)drive.getDirectionDegrees(), 0);
         }else{
-            rdrive.arcadeDrive(drive);
+            //rdrive.arcadeDrive(drive);
+            rdrive.arcadeDrive(drive.getX()/2, drive.getY()/2);
         }
         
         /*xv = drive.getX();
