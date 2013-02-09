@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
  * directory.
  */
 public class RobotTemplate extends IterativeRobot {
-    private Joystick drive;
+    private Joystick drive, armstick;
     private RobotDrive rdrive;
     //private double xv, yv, tv;
     private double mag, tv;
@@ -40,6 +40,7 @@ public class RobotTemplate extends IterativeRobot {
         getWatchdog().setEnabled(false);
         System.out.println("*kills watchdog*");
         drive = new Joystick(1);
+        armstick = new Joystick(2);
         rdrive = new RobotDrive(constants.LEFT_TOP_JAG, constants.LEFT_BOTTOM_JAG, constants.RIGHT_TOP_JAG, constants.RIGHT_BOTTOM_JAG);
         rdrive.setSensitivity(constants.DRIVE_SENSITIVITY);
         ls_bottom = new LimitSwitch(1);
@@ -94,6 +95,24 @@ public class RobotTemplate extends IterativeRobot {
             //rdrive.arcadeDrive(drive);
             rdrive.arcadeDrive(drive.getX()/2, drive.getY()/2);
         }
+        
+        
+        
+        
+        
+        //Arm Code
+        if(armstick.getMagnitude() >= constants.DEADBAND_VAL){
+            if(armstick.getRawButton(1)){
+                arm.setRotate(armstick.getX());
+            }else{
+                arm.setChain(armstick.getY() * -1.0);
+            }
+        }
+        ///Arm Code
+        
+        
+        
+        
         
         /*xv = drive.getX();
         if(Math.abs(xv) < constants.DEADBAND_VAL){
