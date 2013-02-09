@@ -25,15 +25,26 @@ public class RobotTemplate extends IterativeRobot {
     private RobotDrive rdrive;
     //private double xv, yv, tv;
     private double mag, tv;
+    private LimitSwitch ls_bottom, ls_top;
+    private ClimbArm arm;
+    //private Dashboard dash;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
-        System.out.println("cRIO Ready.");
+        //dash = new Dashboard();
+        //dash.
+        
+        System.out.println("*pulls out knife*");
+        getWatchdog().setEnabled(false);
+        System.out.println("*kills watchdog*");
         drive = new Joystick(1);
         rdrive = new RobotDrive(constants.LEFT_TOP_JAG, constants.LEFT_BOTTOM_JAG, constants.RIGHT_TOP_JAG, constants.RIGHT_BOTTOM_JAG);
         rdrive.setSensitivity(constants.DRIVE_SENSITIVITY);
+        ls_bottom = new LimitSwitch(1);
+        ls_top = new LimitSwitch(2);
+        arm = new ClimbArm(constants.ROTATE_VICTOR, constants.CHAIN_VICTOR);
     }
 
     /**
@@ -59,7 +70,16 @@ public class RobotTemplate extends IterativeRobot {
             tv *= Math.abs(tv);
             tv *= 0.5;
         }*/
-        
+        if(ls_top.isClosed()){
+            //Limit switch on port 1 would make this go.
+        }else{
+            //Limit switch on port 1 would make this dinner.
+        }
+        if(ls_bottom.isClosed()){
+            //Limit switch on port 2 would make this go.
+        }else{
+            //Limit switch on port 2 would make this dinner.
+        }
         mag = drive.getMagnitude();
         if(Math.abs(mag) < constants.DEADBAND_VAL){
             mag = 0;

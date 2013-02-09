@@ -15,4 +15,6 @@ public class constants {
     static final int LEFT_BOTTOM_JAG = 4;
     static final double DRIVE_SENSITIVITY = 0.005;
     static final double DEADBAND_VAL = 0.15;
+    static final int ROTATE_VICTOR = 5;
+    static final int CHAIN_VICTOR = 6;
 }
