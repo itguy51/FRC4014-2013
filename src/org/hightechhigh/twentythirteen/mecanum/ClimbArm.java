@@ -4,6 +4,7 @@
  */
 package org.hightechhigh.twentythirteen.mecanum;
 
+import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.Victor;
 
 /**
@@ -12,7 +13,8 @@ import edu.wpi.first.wpilibj.Victor;
  */
 public class ClimbArm {
     private Victor rotate_victor, chain_victor;
-    public ClimbArm(int rotate, int chain){
+    private AnalogChannel rotationSensor;
+    public ClimbArm(int rotate, int chain, int sensorChannel){
         rotate_victor = new Victor(rotate);
         chain_victor = new Victor(chain);
         chain_victor.set(0);
@@ -24,6 +26,6 @@ public class ClimbArm {
     public void setRotate(double val){
         rotate_victor.set(val);
     }
-    
+   
     
 }

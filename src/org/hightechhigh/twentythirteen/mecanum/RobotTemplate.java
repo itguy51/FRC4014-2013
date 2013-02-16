@@ -8,6 +8,7 @@
 package org.hightechhigh.twentythirteen.mecanum;
 
 
+import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -23,10 +24,12 @@ import edu.wpi.first.wpilibj.Timer;
 public class RobotTemplate extends IterativeRobot {
     private Joystick drive, armstick;
     private RobotDrive rdrive;
+    private CANJaguar topLeft, botLeft, topRight;
     //private double xv, yv, tv;
     private double mag, tv;
     private LimitSwitch ls_bottom, ls_top;
     private ClimbArm arm;
+    private double rotVal, hookVal;
     //private Dashboard dash;
     /**
      * This function is run when the robot is first started up and should be
@@ -101,12 +104,29 @@ public class RobotTemplate extends IterativeRobot {
         
         
         //Arm Code
-        if(armstick.getMagnitude() >= constants.DEADBAND_VAL){
+        if(armstick.getMagnitude() >= constants.DEADBAND_VAL * constants.MODIFIER_DEADBAND){
             if(armstick.getRawButton(1)){
-                arm.setRotate(armstick.getX());
-            }else{
-                arm.setChain(armstick.getY() * -1.0);
+                rotVal = (-armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
+                System.out.println("ROTATE VALUE: " + rotVal);
+                arm.setRotate(rotVal);
             }
+            else {
+                arm.setRotate(0);
+                //System.out.println("ROTATE STOPPED (RELEASED)");
+            }
+            
+            if(armstick.getRawButton(2)){
+                hookVal = (armstick.getRawAxis(2) * -1.0 * constants.CLIMB_BAND);
+                arm.setChain(hookVal);
+                System.out.println("HOOK VALUE: " + hookVal);
+            }else{
+                arm.setChain(0);
+                //System.out.println("HOOK STOPPED (RELEASED)");
+            }
+        }else{
+            arm.setRotate(0);
+            arm.setChain(0);
+            //System.out.println("ARM STOPPED");
         }
         ///Arm Code
         
