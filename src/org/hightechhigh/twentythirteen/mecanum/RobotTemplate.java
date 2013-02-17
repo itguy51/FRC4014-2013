@@ -138,9 +138,12 @@ public class RobotTemplate extends IterativeRobot {
                 center = arm.getArmOutConst();
             }
         }
-         if(armstick.getRawButton(constants.SET_CENTER_VALUE_BUTTON))
+         if(center != 0 && armstick.getRawButton(constants.SET_CENTER_VALUE_BUTTON))
         {
             rotVal = (-armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
+            if(center < 0) {
+                rotVal *= -1;
+            }
         }
          arm.setRotate(normalize(rotVal + center));
         
