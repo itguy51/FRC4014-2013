@@ -28,7 +28,6 @@ public class RobotTemplate extends IterativeRobot {
     
     //private double xv, yv, tv;
     private double mag, tv;
-    private LimitSwitch ls_bottom, ls_top;
     private ClimbArm arm;
     private double hookVal;
     //private Dashboard dash;
@@ -39,25 +38,28 @@ public class RobotTemplate extends IterativeRobot {
     public void robotInit() {
         //dash = new Dashboard();
         //dash.
-        /*try{
+        //BEGIN DRIVE CODE FOR CAN
+        try{
         botRight = new CANJaguar(constants.RIGHT_BOTTOM_JAG);
         botLeft = new CANJaguar(constants.LEFT_BOTTOM_JAG);
         topRight = new CANJaguar(constants.RIGHT_TOP_JAG);
         topLeft = new CANJaguar(constants.LEFT_TOP_JAG);
         }catch(Exception e){
             System.err.println(e);
-        }*/
+        }
+        rdrive = new RobotDrive(topLeft, botLeft, topRight, botRight);
+        rdrive.setMaxOutput(0.0);
+        //END DRIVE CODE FOR CAN
         System.out.println("*pulls out knife*");
         getWatchdog().setEnabled(false);
         System.out.println("*kills watchdog*");
         drive = new Joystick(1);
         armstick = new Joystick(2);
-        rdrive = new RobotDrive(constants.LEFT_TOP_JAG, constants.LEFT_BOTTOM_JAG, constants.RIGHT_TOP_JAG, constants.RIGHT_BOTTOM_JAG);
-        //rdrive = new RobotDrive(topLeft, botLeft, topRight, botRight);
+        //rdrive = new RobotDrive(constants.LEFT_TOP_JAG, constants.LEFT_BOTTOM_JAG, constants.RIGHT_TOP_JAG, constants.RIGHT_BOTTOM_JAG);
+        
 
         rdrive.setSensitivity(constants.DRIVE_SENSITIVITY);
-        ls_bottom = new LimitSwitch(1);
-        ls_top = new LimitSwitch(2);
+
         arm = new ClimbArm(constants.ROTATE_VICTOR, constants.CHAIN_VICTOR, constants.ARM_SENSOR);
     }
 
@@ -84,23 +86,18 @@ public class RobotTemplate extends IterativeRobot {
             tv *= Math.abs(tv);
             tv *= 0.5;
         }*/
-        if(ls_top.isClosed()){
-            //Limit switch on port 1 would make this go.
-        }else{
-            //Limit switch on port 1 would make this dinner.
-        }
-        if(ls_bottom.isClosed()){
-            //Limit switch on port 2 would make this go.
-        }else{
-            //Limit switch on port 2 would make this dinner.
-        }
+
         mag = drive.getMagnitude();
         if(Math.abs(mag) < constants.DEADBAND_VAL){
             mag = 0;
         }else{
             mag *= Math.abs(mag);
         }
-        mag *= 0.5;
+        if(drive.getRawButton(2)){
+            mag *= constants.DRIVE_HIGH_MAGNITUDE;
+        }else{
+            mag *= constants.DRIVE_MAGNITUDE;
+        }
         
         if(drive.getRawButton(1)){
             rdrive.mecanumDrive_Polar(mag, (float)drive.getDirectionDegrees(), 0);
@@ -114,11 +111,22 @@ public class RobotTemplate extends IterativeRobot {
         
         
         //Arm Code
+        if(armstick.getRawButton(constants.DEPLOY_HOOK_BUTTON)){
+            arm.setHookForward();
+        }else if(armstick.getRawButton(constants.RETRACT_HOOK_BUTTON)){
+            arm.setHookBack();
+        }else{
+            arm.stopHooks();
+        }
         
-        if(armstick.getRawButton(constants.INCREMENT_HOLD_BUTTON)){
-           arm.incrementArm();
-        }else if(armstick.getRawButton(constants.DECREMENT_HOLD_BUTTON)){
-            arm.decrementArm();
+        if(armstick.getRawButton(constants.INCREMENT_HOLD_IN_BUTTON)){
+           arm.decrementArmIn();
+        }else if(armstick.getRawButton(constants.DECREMENT_HOLD_IN_BUTTON)){
+            arm.incrementArmIn();
+        }if(armstick.getRawButton(constants.DECREMENT_HOLD_OUT_BUTTON)){
+           arm.decrementArmOut();
+        }else if(armstick.getRawButton(constants.INCREMENT_HOLD_OUT_BUTTON)){
+            arm.incrementArmOut();
         }else if(armstick.getRawButton(constants.PRINT_POWER_BUTTON)){
             arm.printPower();
         }
@@ -133,21 +141,30 @@ public class RobotTemplate extends IterativeRobot {
         else
         {
             if(armstick.getRawButton(constants.HOLD_IN_BUTTON)){
+                System.out.println("BUTTON 12 PRESSED");
                 center = arm.getArmInConst();
             }else if(armstick.getRawButton(constants.HOLD_OUT_BUTTON)){
                 center = arm.getArmOutConst();
+                System.out.println("BUTTON 11 PRESSED");
+            }else{
+                
+                System.out.println("BUTTON 11&12 NOT PRESSED");
             }
         }
          if(center != 0 && armstick.getRawButton(constants.SET_CENTER_VALUE_BUTTON))
         {
-            rotVal = (-armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
+            rotVal = (armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
             if(center < 0) {
                 rotVal *= -1;
             }
         }
          arm.setRotate(normalize(rotVal + center));
         
-        
+        if(armstick.getRawButton(constants.MANUAL_CLAW_RUN_BUTTON)){
+            arm.setChain(armstick.getRawAxis(2) * constants.CLIMB_BAND * -1.0);
+        }else{
+            arm.setChain(0);
+        }
         /* <Old Stuff>
         
         //if(armstick.getMagnitude() >= constants.DEADBAND_VAL * constants.MODIFIER_DEADBAND){

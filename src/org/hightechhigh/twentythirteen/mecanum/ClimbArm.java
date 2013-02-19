@@ -5,7 +5,10 @@
 package org.hightechhigh.twentythirteen.mecanum;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 
 /**
@@ -15,13 +18,17 @@ import edu.wpi.first.wpilibj.Victor;
 public class ClimbArm {
     private Victor rotate_victor, chain_victor;
     private AnalogChannel rotationSensor;
+    private DigitalInput topSwitch, bottomSwitch;
     private PIDController rotatePID;
     private double P_CONST, I_CONST, D_CONST;
     private double ARM_CONST = constants.BASE_STICK_IN_STALL;
     private double ARM_OUT_CONST = constants.BASE_STICK_OUT_STALL;
+    private Relay hookRelay;
     public ClimbArm(int rotate, int chain, int sensorChannel){
         rotate_victor = new Victor(rotate);
         chain_victor = new Victor(chain);
+        topSwitch = new DigitalInput(2);
+        bottomSwitch = new DigitalInput(1);
         rotationSensor = new AnalogChannel(sensorChannel);
         //rotatePID = new PIDController(constants.ARM_P, constants.ARM_I, constants.ARM_D, rotationSensor, rotate_victor);
         rotatePID = new PIDController(constants.ARM_P, constants.ARM_I, constants.ARM_D, rotationSensor, rotate_victor);
@@ -30,6 +37,8 @@ public class ClimbArm {
         rotatePID.setOutputRange(-0.65, 0.65);
         chain_victor.set(0);
         rotate_victor.set(0);
+        hookRelay = new Relay(1);
+        hookRelay.set(Relay.Value.kOff);
     }
     public double getSensorVoltage(){
         return rotationSensor.getVoltage();
@@ -42,6 +51,12 @@ public class ClimbArm {
         }
     }
     public void setChain(double val){
+        if(!topSwitch.get() && val > 0){
+            val = 0;
+            //System.out.println("Top Swtich down, ignoring.");
+        }else if(!bottomSwitch.get() && val < 0){
+            val = 0;
+        }
         chain_victor.set(val);
     }
     public void setRotate(double val){
@@ -49,7 +64,15 @@ public class ClimbArm {
     }
     
     
-    
+    public void setHookForward(){
+        hookRelay.set(Relay.Value.kForward);
+    }
+    public void setHookBack(){
+        hookRelay.set(Relay.Value.kReverse);
+    }
+    public void stopHooks(){
+        hookRelay.set(Relay.Value.kOff);
+    }
     
     //PID stuff
     public void incrementP(){
@@ -76,13 +99,21 @@ public class ClimbArm {
             D_CONST -= 0.001;
             invokeReload();
     }
-    public void incrementArm(){
+    public void incrementArmIn(){
         ARM_CONST += 0.001;
-        System.out.println("CONST UP: " + ARM_CONST);
+        System.out.println("IN CONST UP: " + ARM_CONST);
     }
-    public void decrementArm(){
+    public void decrementArmIn(){
         ARM_CONST -= 0.001;
-        System.out.println("CONST DOWN: " + ARM_CONST);
+        System.out.println("IN CONST DOWN: " + ARM_CONST);
+    }
+    public void incrementArmOut(){
+        ARM_OUT_CONST += 0.001;
+        System.out.println("OUT CONST UP: " + ARM_CONST);
+    }
+    public void decrementArmOut(){
+        ARM_OUT_CONST -= 0.001;
+        System.out.println("OUT CONST DOWN: " + ARM_CONST);
     }
     public double getArmInConst(){
         return ARM_CONST;
@@ -107,5 +138,29 @@ public class ClimbArm {
             System.out.println("V: " + getSensorVoltage());
     }
    
-    
+    public void automaticOutRun(){
+        setRotate(0.2);
+        Timer.delay(700);
+        setRotate(ARM_OUT_CONST);
+    }
+    public void automaticInRun(){
+        setRotate(-0.2);
+        Timer.delay(700);
+        setRotate(ARM_CONST);
+    }
+    public void step1(){
+        //Theoretical 10 point climb.
+        setRotate(0.2);
+        Timer.delay(400);
+        setRotate(0.0);
+        Timer.delay(50);
+        while(bottomSwitch.get()){
+            setChain(0.15);
+            Timer.delay(10);
+        }
+        setChain(0.0);
+        
+    }
 }
+
+
