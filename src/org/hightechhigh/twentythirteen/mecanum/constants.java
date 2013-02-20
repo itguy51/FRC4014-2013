@@ -15,7 +15,7 @@ public class constants {
     static final int LEFT_BOTTOM_JAG = 1;//1;
     static final double DRIVE_SENSITIVITY = 0.005;
     static final double DEADBAND_VAL = 0.15;
-    static final int ROTATE_VICTOR = 1;
+    static final int ROTATE_VICTOR = 3;
     static final int CHAIN_VICTOR = 2;
     static final double ARM_BAND = 0.6;
     static final double CLIMB_BAND = 0.8;
@@ -47,6 +47,7 @@ public class constants {
     static final int DECREMENT_HOLD_OUT_BUTTON = 9;    
     static final int DEPLOY_HOOK_BUTTON = 6;
     static final int RETRACT_HOOK_BUTTON = 4;
+    static final int OVERRIDE_LIMIT_SWITCH_BUTTON = 5;
     //Drive stick buttons
     
 }

@@ -127,9 +127,9 @@ public class RobotTemplate extends IterativeRobot {
            arm.decrementArmOut();
         }else if(armstick.getRawButton(constants.INCREMENT_HOLD_OUT_BUTTON)){
             arm.incrementArmOut();
-        }else if(armstick.getRawButton(constants.PRINT_POWER_BUTTON)){
+        }/*else if(armstick.getRawButton(constants.PRINT_POWER_BUTTON)){
             arm.printPower();
-        }
+        }*/
         
         double center = 0;
         double rotVal = 0;
@@ -137,6 +137,8 @@ public class RobotTemplate extends IterativeRobot {
         if(armstick.getRawButton(constants.MANUAL_ARM_ROTATE_BUTTON))
         {
             rotVal = (-armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
+            //System.out.println("ROTATE: " + rotVal);
+            
         }
         else
         {
@@ -148,7 +150,7 @@ public class RobotTemplate extends IterativeRobot {
                 System.out.println("BUTTON 11 PRESSED");
             }else{
                 
-                System.out.println("BUTTON 11&12 NOT PRESSED");
+                //System.out.println("BUTTON 11&12 NOT PRESSED");
             }
         }
          if(center != 0 && armstick.getRawButton(constants.SET_CENTER_VALUE_BUTTON))
@@ -161,7 +163,7 @@ public class RobotTemplate extends IterativeRobot {
          arm.setRotate(normalize(rotVal + center));
         
         if(armstick.getRawButton(constants.MANUAL_CLAW_RUN_BUTTON)){
-            arm.setChain(armstick.getRawAxis(2) * constants.CLIMB_BAND * -1.0);
+            arm.setChain((armstick.getRawAxis(2) * constants.CLIMB_BAND * -1.0), armstick.getRawButton(constants.OVERRIDE_LIMIT_SWITCH_BUTTON));
         }else{
             arm.setChain(0);
         }

@@ -26,6 +26,7 @@ public class ClimbArm {
     private Relay hookRelay;
     public ClimbArm(int rotate, int chain, int sensorChannel){
         rotate_victor = new Victor(rotate);
+        //rotate_victor.disable();
         chain_victor = new Victor(chain);
         topSwitch = new DigitalInput(2);
         bottomSwitch = new DigitalInput(1);
@@ -50,14 +51,17 @@ public class ClimbArm {
             rotatePID.disable();
         }
     }
-    public void setChain(double val){
-        if(!topSwitch.get() && val > 0){
+    public void setChain(double val, boolean override){
+        if(!topSwitch.get() && val > 0 && !override){
             val = 0;
             //System.out.println("Top Swtich down, ignoring.");
-        }else if(!bottomSwitch.get() && val < 0){
+        }else if(!bottomSwitch.get() && val < 0 && !override){
             val = 0;
         }
         chain_victor.set(val);
+    }
+    public void setChain(double val){
+        setChain(val, false);
     }
     public void setRotate(double val){
         rotate_victor.set(val);
