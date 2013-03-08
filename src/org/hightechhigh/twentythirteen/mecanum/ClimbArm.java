@@ -60,7 +60,7 @@ public class ClimbArm {
             val = 0;
         }
         if(over){
-            val *= 0.1;
+            val *= 0.4;
         }
         chain_victor.set(val);
     }
