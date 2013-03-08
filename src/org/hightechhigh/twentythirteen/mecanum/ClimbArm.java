@@ -24,6 +24,7 @@ public class ClimbArm {
     private double ARM_CONST = constants.BASE_STICK_IN_STALL;
     private double ARM_OUT_CONST = constants.BASE_STICK_OUT_STALL;
     private Relay hookRelay;
+    private boolean override;
     public ClimbArm(int rotate, int chain, int sensorChannel){
         rotate_victor = new Victor(rotate);
         //rotate_victor.disable();
@@ -51,33 +52,39 @@ public class ClimbArm {
             rotatePID.disable();
         }
     }
-    public void setChain(double val, boolean override){
-        if(!topSwitch.get() && val > 0 && !override){
+    public void setChain(double val, boolean over){
+        if(!topSwitch.get() && val > 0 && !over){
             val = 0;
             //System.out.println("Top Swtich down, ignoring.");
-        }else if(!bottomSwitch.get() && val < 0 && !override){
+        }else if(!bottomSwitch.get() && val < 0 && !over){
             val = 0;
+        }
+        if(over){
+            val *= 0.1;
         }
         chain_victor.set(val);
     }
     public void setChain(double val){
-        setChain(val, false);
+        setChain(val, override);
     }
     public void setRotate(double val){
+        System.out.println("CURRENT ROTATE: " + val);
         rotate_victor.set(val);
     }
     
     
     public void setHookForward(){
-        hookRelay.set(Relay.Value.kForward);
+        hookRelay.set(Relay.Value.kReverse);
     }
     public void setHookBack(){
-        hookRelay.set(Relay.Value.kReverse);
+        hookRelay.set(Relay.Value.kForward);
     }
     public void stopHooks(){
         hookRelay.set(Relay.Value.kOff);
     }
-    
+    public void setOverride(boolean ovr){
+        override = ovr;
+    }
     //PID stuff
     public void incrementP(){
             P_CONST += 0.001;
@@ -104,19 +111,19 @@ public class ClimbArm {
             invokeReload();
     }
     public void incrementArmIn(){
-        ARM_CONST += 0.001;
+        ARM_CONST += 0.005;
         System.out.println("IN CONST UP: " + ARM_CONST);
     }
     public void decrementArmIn(){
-        ARM_CONST -= 0.001;
+        ARM_CONST -= 0.005;
         System.out.println("IN CONST DOWN: " + ARM_CONST);
     }
     public void incrementArmOut(){
-        ARM_OUT_CONST += 0.001;
+        ARM_OUT_CONST += 0.005;
         System.out.println("OUT CONST UP: " + ARM_CONST);
     }
     public void decrementArmOut(){
-        ARM_OUT_CONST -= 0.001;
+        ARM_OUT_CONST -= 0.005;
         System.out.println("OUT CONST DOWN: " + ARM_CONST);
     }
     public double getArmInConst(){
@@ -153,17 +160,11 @@ public class ClimbArm {
         setRotate(ARM_CONST);
     }
     public void step1(){
-        //Theoretical 10 point climb.
-        setRotate(0.2);
-        Timer.delay(400);
-        setRotate(0.0);
-        Timer.delay(50);
         while(bottomSwitch.get()){
-            setChain(0.15);
-            Timer.delay(10);
+            setChain(-0.70);
+            Timer.delay(0.010);
         }
         setChain(0.0);
-        
     }
 }
 

@@ -9,6 +9,7 @@ package org.hightechhigh.twentythirteen.mecanum;
 
 
 import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -30,12 +31,15 @@ public class RobotTemplate extends IterativeRobot {
     private double mag, tv;
     private ClimbArm arm;
     private double hookVal;
+    //private Logger log;
+    private boolean runYet = false;
     //private Dashboard dash;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
+        
         //dash = new Dashboard();
         //dash.
         //BEGIN DRIVE CODE FOR CAN
@@ -56,7 +60,7 @@ public class RobotTemplate extends IterativeRobot {
         drive = new Joystick(1);
         armstick = new Joystick(2);
         //rdrive = new RobotDrive(constants.LEFT_TOP_JAG, constants.LEFT_BOTTOM_JAG, constants.RIGHT_TOP_JAG, constants.RIGHT_BOTTOM_JAG);
-        
+        //log = new Logger(true);
 
         rdrive.setSensitivity(constants.DRIVE_SENSITIVITY);
 
@@ -67,13 +71,17 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-       
+        if(!runYet){
+            arm.step1();
+        }
     }
+    
 
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+        //log.iterationLoop();
         /*if(drive.getRawButton(1)){
             System.out.println("X: " + drive.getX());
             System.out.println("Y: " + (drive.getY() * -1.0));
@@ -109,7 +117,11 @@ public class RobotTemplate extends IterativeRobot {
         
         
         
-        
+        if(drive.getRawButton(11)){
+            arm.setOverride(true);
+        }else{
+            arm.setOverride(false);
+        }
         //Arm Code
         if(armstick.getRawButton(constants.DEPLOY_HOOK_BUTTON)){
             arm.setHookForward();
@@ -143,16 +155,17 @@ public class RobotTemplate extends IterativeRobot {
         else
         {
             if(armstick.getRawButton(constants.HOLD_IN_BUTTON)){
-                System.out.println("BUTTON 12 PRESSED");
+                //System.out.println("BUTTON 12 PRESSED");
                 center = arm.getArmInConst();
             }else if(armstick.getRawButton(constants.HOLD_OUT_BUTTON)){
                 center = arm.getArmOutConst();
-                System.out.println("BUTTON 11 PRESSED");
+                //System.out.println("BUTTON 11 PRESSED");
             }else{
                 
                 //System.out.println("BUTTON 11&12 NOT PRESSED");
             }
         }
+        
          if(center != 0 && armstick.getRawButton(constants.SET_CENTER_VALUE_BUTTON))
         {
             rotVal = (armstick.getRawAxis(1) * Math.abs(armstick.getRawAxis(1)) * constants.ARM_BAND);
