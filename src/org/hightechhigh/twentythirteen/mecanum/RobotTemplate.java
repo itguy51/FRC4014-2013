@@ -52,7 +52,7 @@ public class RobotTemplate extends IterativeRobot {
             System.err.println(e);
         }
         rdrive = new RobotDrive(topLeft, botLeft, topRight, botRight);
-        rdrive.setMaxOutput(0.0);
+        //rdrive.setMaxOutput(0.0);
         //END DRIVE CODE FOR CAN
         System.out.println("*pulls out knife*");
         getWatchdog().setEnabled(false);
